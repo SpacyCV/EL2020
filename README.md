@@ -6,15 +6,15 @@ This repository documents my class work and projects done for ***CPS342***
 
 1. *Personal Information*
 
-Name: *Bryan Warno*
+   Name: *Bryan Warno*
 
-Major: *Music*
+   Major: *Music*
 
-Minor *Computer Science*
+   Minor *Computer Science*
 
-ID: [N03437661](https://github.com/N03437661)
+   ID: [N03437661](https://github.com/N03437661)
 
-Year: Senior
+   Year: Senior
 
 2. *Class Start Date:* Jan 22, 2020
 
