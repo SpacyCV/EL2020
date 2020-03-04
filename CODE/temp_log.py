@@ -7,7 +7,7 @@ import os
 #Assign Pins
 lightPin = 27
 tempPin = 17
-touchPin = 26
+#touchPin = 26
 
 tempSensor = Adafruit_DHT.DHT11
 
@@ -18,7 +18,7 @@ blinkTime = 7
 #Initialize GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(lightPin,GPIO.OUT)
-GPIO.setup(touchPin,GPIO.IN)
+#GPIO.setup(touchPin,GPIO.IN)
 
 
 #This function will make the light blink once
@@ -32,21 +32,26 @@ def readF(tempPin):
 	humidity, temperature = Adafruit_DHT.read_retry(tempSensor,tempPin)
 	temperature = temperature * 9/5.0 +32
 	if humidity is not None and temperature is not None:
-		tempFahr = '{0:0.1f}*F'.format(temperature)
+		tempFahr = '{0:0.1f}'.format(temperature)
+		humidity = '{0:0.1f}%'.format(humidity)
 	else:
 		print('Error Reading Sensor')
 
-	return tempFahr
+	return tempFahr,humidity
 
 try:
-	while True:
-		input_state = GPIO.input(touchPin)
-		if input_state == True:
+	with open("../log/tempLog.csv", "a") as log:
+
+		while True:
+			#input_state = GPIO.input(touchPin)
+			#if input_state == True:
 			for i in range (blinkTime):
 				blinkOnce(lightPin)
 			time.sleep(.2)
-			data = readF(tempPin)
-			print (data)
+			temp, humidity = readF(tempPin)
+			print (temp)
+			log.write("{0},{1},{2}\n".format(time.strftime("%Y-%m-%d,%H:%M:%S"),str(temp),str(humidity)))
+			time.sleep(60)
 
 #Cleanup the GPIO when done
 except KeyboardInterrupt:
