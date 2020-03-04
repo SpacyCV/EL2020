@@ -2,20 +2,12 @@
 
 # Spring 2020 Embedded Linux Class.
 
-This repository documents my class work and projects done for ***CPS342***
+This is a python script using the DH11 temperature sensor and a touch sensor
+to make a light blink and read out the temperature when ever athe touch
+sensor is activated.
 
-1. *Personal Information*
+This script is in Python 3
 
-   Name: *Bryan Warno*
-
-   Major: *Music*
-
-   Minor *Computer Science*
-
-   ID: [N03437661](https://github.com/N03437661)
-
-   Year: Senior
-
-2. *Class Start Date:* Jan 22, 2020
-
-3. *Class End Date:* May 8, 2020
+Diode pin = 27
+Touch Sensor pin = 26
+Temperature Sensor pin = 17
