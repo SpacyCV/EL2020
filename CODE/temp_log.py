@@ -3,6 +3,17 @@ import RPi.GPIO as GPIO
 import Adafruit_DHT
 import time
 import os
+import sqlite3 as mydb
+
+con = None
+
+try:
+	con = mydb.connect('../log/tempLog.db')
+	cur = con.cursor()
+	cur.execute('SELECT SQLITE_VERSION()')
+except mydb.Error, e:
+	print "Error %s:" % e.args[0]
+	exit()
 
 #Assign Pins
 lightPin = 27
@@ -50,11 +61,16 @@ try:
 			time.sleep(.2)
 			temp, humidity = readF(tempPin)
 			print (temp)
-			log.write("{0},{1},{2}\n".format(time.strftime("%Y-%m-%d,%H:%M:%S"),str(temp),str(humidity)))
-			time.sleep(60)
+			#log.write("{0},{1},{2}\n".format(time.strftime("%Y-%m-%d,%H:%M:%S"),str(temp),str(humidity)))
+			date = time.strftime("%Y-%m-%d")
+			time = time.strftime("%H:%M:%S")
+			cur.execute("INSERT INTO tempLog VALUES (str(date),str(time),str(temp),str(humidity))")
+			time.sleep(58)
 
 #Cleanup the GPIO when done
 except KeyboardInterrupt:
 	os.system('clear')
+	con.commit()
+	con.close()
 	GPIO.cleanup()
 	print("Clear")
