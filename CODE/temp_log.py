@@ -7,16 +7,14 @@ import sqlite3 as mydb
 
 con = None
 
-try:
-	con = mydb.connect('../log/tempLog.db')
-	cur = con.cursor()
-	cur.execute('SELECT SQLITE_VERSION()')
-except mydb.Error, e:
-	print "Error %s:" % e.args[0]
-	exit()
+con = mydb.connect('../log/tempLog.db')
+cur = con.cursor()
+
+eChk = 0
 
 #Assign Pins
-lightPin = 27
+redPin = 27
+greenPin = 22
 tempPin = 17
 #touchPin = 26
 
@@ -28,7 +26,8 @@ blinkTime = 7
 
 #Initialize GPIO
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(lightPin,GPIO.OUT)
+GPIO.setup(redPin,GPIO.OUT)
+GPIO.setup(greenPin,GPIO.OUT)
 #GPIO.setup(touchPin,GPIO.IN)
 
 
@@ -44,33 +43,46 @@ def readF(tempPin):
 	temperature = temperature * 9/5.0 +32
 	if humidity is not None and temperature is not None:
 		tempFahr = '{0:0.1f}'.format(temperature)
-		humidity = '{0:0.1f}%'.format(humidity)
+		humidity = '{0:0.1f}'.format(humidity)
 	else:
 		print('Error Reading Sensor')
 
 	return tempFahr,humidity
 
-try:
-	with open("../log/tempLog.csv", "a") as log:
+#First iteration of loop
+oldTime = 60
 
-		while True:
-			#input_state = GPIO.input(touchPin)
-			#if input_state == True:
-			for i in range (blinkTime):
-				blinkOnce(lightPin)
-			time.sleep(.2)
-			temp, humidity = readF(tempPin)
-			print (temp)
-			#log.write("{0},{1},{2}\n".format(time.strftime("%Y-%m-%d,%H:%M:%S"),str(temp),str(humidity)))
-			date = time.strftime("%Y-%m-%d")
-			time = time.strftime("%H:%M:%S")
-			cur.execute("INSERT INTO tempLog VALUES (str(date),str(time),str(temp),str(humidity))")
-			time.sleep(58)
+tempF, humid = readF(tempPin)
+
+try:
+
+	while True:
+
+		#if 68 <= float(tempF) <= 78:
+			#eChk = 0
+			#GPIO.output(redPin.False)
+			#GPIO.output(greenPin.True)
+		#else:
+			#GPIO.output(greenPin.False)
+			#oneBlink(redPin)
+
+		if time.time() - oldTime > 59:
+			tempF, humid = readF(tempPin)
+		#Defines and executes sql query
+		cur.execute('INSERT INTO tempLog values(?,?,?)', (time.strftime('%Y-%m-%d %H:%M:%S'),tempF,humid))
+		con.commit()
+		#time.sleep(5)
+
+		table = con.execute("select * from tempLog")
+		os.system('clear')
+		print "%-30s %-20s %-20s" %("Date/Time", "Temp", "Humidity")
+		for row in table:
+			print tempF
+		oldTime = time.time
 
 #Cleanup the GPIO when done
 except KeyboardInterrupt:
 	os.system('clear')
-	con.commit()
 	con.close()
 	GPIO.cleanup()
 	print("Clear")
