@@ -47,12 +47,13 @@ def readF(tempPin):
 	else:
 		print('Error Reading Sensor')
 
-	return tempFahr,humidity
+	return tempFahr, humidity
 
 #First iteration of loop
 oldTime = 60
 
 tempF, humid = readF(tempPin)
+
 
 try:
 
@@ -65,20 +66,19 @@ try:
 		#else:
 			#GPIO.output(greenPin.False)
 			#oneBlink(redPin)
-
-		if time.time() - oldTime > 59:
+		if(time.time() - oldTime) > 59:
 			tempF, humid = readF(tempPin)
-		#Defines and executes sql query
-		cur.execute('INSERT INTO tempLog values(?,?,?)', (time.strftime('%Y-%m-%d %H:%M:%S'),tempF,humid))
-		con.commit()
-		#time.sleep(5)
+			#Defines and executes sql query
+			cur.execute('INSERT INTO tempLog values(?,?,?)', (time.strftime('%Y-%m-%d %H:%M:%S'),tempF,humid))
+			con.commit()
+			#time.sleep(5)
 
-		table = con.execute("select * from tempLog")
-		os.system('clear')
-		print "%-30s %-20s %-20s" %("Date/Time", "Temp", "Humidity")
-		for row in table:
-			print tempF
-		oldTime = time.time
+			table = con.execute("select * from tempLog")
+			os.system('clear')
+			print "%-30s %-20s %-20s" %("Date/Time", "Temp", "Humidity")
+			for row in table:
+				print "%-30s %-20s %-20s" %(row[0], row[1], row[2])
+			oldTime = time.time()
 
 #Cleanup the GPIO when done
 except KeyboardInterrupt:
