@@ -11,10 +11,12 @@
 from flask import Flask, render_template, jsonify, Response
 import sqlite3 as sql
 import json
+import RPi.GPIO as GPIO
+import time
 
 #Globals
-con = sql.connect('../log/tempLog.db')
-cur = con.cursor()
+#con = sql.connect('../log/tempLog.db')
+#cur = con.cursor()
 app = Flask(__name__)
 
 @app.route("/")
@@ -23,8 +25,10 @@ def index():
 
 @app.route("/sqlData")
 def chartData():
+	con = sql.connect('../log/tempLog.db')
+	cur = con.cursor()
 	con.row_factory = sql.Row
-	cur.execute("SELECT Date, Temperature FROM tempLog WHERE Temperature > 60")
+	cur.execute("SELECT * FROM ( SELECT Date, Temperature FROM tempLog WHERE Temperature > 55 ORDER BY Date DESC LIMIT 700 ) X ORDER BY Date ASC")
 	dataset = cur.fetchall()
 	print (dataset)
 	chartData = []
@@ -32,5 +36,16 @@ def chartData():
 		chartData.append({"Date": row[0], "Temperature": float(row[1])})
 	return Response(json.dumps(chartData), mimetype='application/json')
 
+@app.route("/blinkLED")
+def blinker():
+	GPIO.setmode(GPIO.BCM)
+	GPIO.setup(27,GPIO.OUT)
+	GPIO.output(27,True)
+	time.sleep(.5)
+	GPIO.output(27,False)
+	time.sleep(.5)
+	GPIO.cleanup()
+	return "Blinked!"
+
 if __name__ == "__main__":
-	app.run(host='0.0.0.0', port=2020, debug=True)
+	app.run(host='0.0.0.0', port=2020, debug=True, use_reloader=False)
