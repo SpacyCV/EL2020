@@ -28,7 +28,7 @@ def chartData():
 	con = sql.connect('../log/tempLog.db')
 	cur = con.cursor()
 	con.row_factory = sql.Row
-	cur.execute("SELECT * FROM ( SELECT Date, Temperature FROM tempLog WHERE Temperature > 55 ORDER BY Date DESC LIMIT 700 ) X ORDER BY Date ASC")
+	cur.execute("SELECT * FROM ( SELECT Date, Temperature FROM tempLog WHERE Temperature > 55 ORDER BY Date DESC LIMIT 1000 ) X ORDER BY Date ASC")
 	dataset = cur.fetchall()
 	print (dataset)
 	chartData = []
